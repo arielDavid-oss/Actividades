@@ -2,10 +2,10 @@ package com.arieldavidoss.actividades.ui.home;
 
 public class Tarea {
     private int id;
-    private String nombre;
-    private String descripcion;
-    private int completada;
-    private String fechaTerminacion;
+    private final String nombre;
+    private final String descripcion;
+    private final int completada;
+    private final String fechaTerminacion;
 
     public Tarea(int id, String nombre, String descripcion, int completada, String fechaTerminacion) {
         this.id = id;
