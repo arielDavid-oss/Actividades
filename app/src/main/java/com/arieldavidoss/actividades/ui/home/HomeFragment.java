@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,15 +20,17 @@ public class HomeFragment extends Fragment {
 
     private RecyclerView recyclerViewTareas;
     private SQLiteHelper dbHelper;
-    private TareasAdapter tareasAdapter;
-    private List<Tarea> listaTareas;
+    private TareasAdapter tareaAdapter;
+    private List<Tarea> tareaList = new ArrayList<>();
 
+    @Nullable
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View root = inflater.inflate(R.layout.fragment_home, container, false);
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        recyclerViewTareas = root.findViewById(R.id.recyclerViewTareas);
+        recyclerViewTareas = view.findViewById(R.id.recyclerViewTareas);
         recyclerViewTareas.setLayoutManager(new LinearLayoutManager(getContext()));
 
         dbHelper = new SQLiteHelper(getContext());
@@ -35,26 +38,31 @@ public class HomeFragment extends Fragment {
         // Cargar tareas desde la base de datos
         cargarTareas();
 
-        tareasAdapter = new TareasAdapter(getContext(), listaTareas);
-        recyclerViewTareas.setAdapter(tareasAdapter);
+        tareaAdapter = new TareasAdapter(tareaList, getContext());
+        recyclerViewTareas.setAdapter(tareaAdapter);
 
-        return root;
+        return view;
     }
 
     private void cargarTareas() {
-        listaTareas = new ArrayList<>();
+        tareaList.clear();
+
         Cursor cursor = dbHelper.getAllActividades();
 
-        if (cursor != null && cursor.getCount() > 0) {
-            while (cursor.moveToNext()) {
-                @SuppressLint("Range") String nombre = cursor.getString(cursor.getColumnIndex("nombreActividad"));
-                @SuppressLint("Range") String descripcion = cursor.getString(cursor.getColumnIndex("descripcionActividad"));
-                @SuppressLint("Range") String fecha = cursor.getString(cursor.getColumnIndex("horaFin"));
-                listaTareas.add(new Tarea(nombre, descripcion, fecha));
-            }
+
+        if (cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+                String nombre = cursor.getString(cursor.getColumnIndexOrThrow("nombreActividad"));
+                String descripcion = cursor.getString(cursor.getColumnIndexOrThrow("descripcion"));
+                int completada = cursor.getInt(cursor.getColumnIndexOrThrow("completada"));
+                String horaFin = cursor.getString(cursor.getColumnIndexOrThrow("horaFin"));
+
+                // Agrega la tarea a la lista
+                tareaList.add(new Tarea(id,nombre, descripcion,completada ,horaFin));
+
+            } while (cursor.moveToNext());
         }
-        if (cursor != null) {
             cursor.close();
-        }
     }
 }

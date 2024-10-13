@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
@@ -12,35 +13,86 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/tvNombreTarea"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Nombre de la tarea"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/black" />
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvDescripcionTarea"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Descripción de la tarea"
-            android:textSize="14sp"
-            android:layout_marginTop="4dp"
-            android:textColor="@android:color/darker_gray" />
 
-        <TextView
-            android:id="@+id/tvFechaTerminacion"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Fecha de terminación"
-            android:textSize="12sp"
-            android:layout_marginTop="4dp"
-            android:textColor="@android:color/holo_blue_dark" />
+            <TextView
+                android:id="@+id/tvNombreTarea"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nombre de la tarea"
+                android:textSize="38sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black" />
 
+            <TextView
+                android:id="@+id/tvDescripcionTarea"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Descripción de la tarea"
+                android:textSize="24sp"
+                android:layout_marginTop="4dp"
+                android:textColor="@android:color/darker_gray" />
+
+            <TextView
+                android:id="@+id/tvVFechaTerminacion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fecha de terminación:"
+                android:textSize="22sp"
+                android:layout_marginTop="4dp"
+                android:textColor="@android:color/holo_blue_dark" />
+
+            <TextView
+                android:id="@+id/tvFechaTerminacion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fecha de terminación"
+                android:textSize="19sp"
+                android:layout_marginTop="4dp"
+                android:textColor="#ED0202" />
+        </LinearLayout>
+
+        <!-- Sección para los botones de eliminar y completar -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:layout_gravity="end">
+
+            <!-- Botón de eliminar -->
+            <ImageButton
+                android:id="@+id/btnEliminarTarea"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_delete"
+                android:contentDescription="Eliminar tarea"
+                android:tint="@android:color/holo_red_dark"
+                android:layout_marginTop="8dp"
+                tools:ignore="UseAppTint" />
+
+
+            <!-- Botón de completar -->
+            <ImageButton
+                android:id="@+id/btnCompletarTarea"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_agenda"
+                android:contentDescription="Completar tarea"
+                android:tint="@android:color/holo_green_dark"
+                android:layout_marginTop="16dp"
+                tools:ignore="UseAppTint" />
+        </LinearLayout>
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

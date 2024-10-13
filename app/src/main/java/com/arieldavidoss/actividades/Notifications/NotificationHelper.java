@@ -13,7 +13,7 @@ public class NotificationHelper {
     // Método para programar la notificación antes de que la actividad termine (por ejemplo, 10 minutos antes)
     public static void scheduleNotification(Context context, String nombreActividad, Calendar horaFin) {
         // Restar 10 minutos a la hora de fin
-        horaFin.add(Calendar.MINUTE, -10);
+        horaFin.add(Calendar.SUNDAY, -1);
 
         // Configurar AlarmManager para disparar la notificación
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

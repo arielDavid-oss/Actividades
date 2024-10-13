@@ -11,10 +11,10 @@ public class SQLiteHelper  extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "actividades.db";
     private static final int DATABASE_VERSION = 1;
     public static final String TABLE_ACTIVIDADES = "actividades";
-
     private static final String COLUMN_ID = "id";
     private static final String COLUMN_NOMBRE = "nombreActividad";
     private static final String COLUMN_DESCRIPCION = "descripcion";
+    private static final String COLUMN_COMPLETADA = "completada";
     private static final String COLUMN_HORA_FIN = "horaFin";
 
     public SQLiteHelper(Context context) {
@@ -27,6 +27,7 @@ public class SQLiteHelper  extends SQLiteOpenHelper {
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_NOMBRE + " TEXT, " +
                 COLUMN_DESCRIPCION + " TEXT, " +
+                COLUMN_COMPLETADA + " INTEGER DEFAULT 0 NOT NULL, " +
                 COLUMN_HORA_FIN + " TEXT" +
                 ")";
         sqLiteDatabase.execSQL(sql);
@@ -62,15 +63,22 @@ public class SQLiteHelper  extends SQLiteOpenHelper {
         db.delete(TABLE_ACTIVIDADES, COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
         db.close();
     }
-
-    // Actualizar una actividad
-    public void updateActividad(int id, String nombreActividad,String descripcion, String horaFin) {
+    public void updateTareaCompletada(int tareaId, int completada) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(COLUMN_NOMBRE, nombreActividad);
-        values.put(COLUMN_DESCRIPCION, descripcion);
-        values.put(COLUMN_HORA_FIN, horaFin);
-        db.update(TABLE_ACTIVIDADES, values, COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
+        values.put(COLUMN_COMPLETADA, completada);
+        db.update(TABLE_ACTIVIDADES, values, COLUMN_ID + " = ?", new String[]{String.valueOf(tareaId)});
         db.close();
     }
+
+    // Actualizar una actividad
+//    public void updateActividad(int id, String nombreActividad,String descripcion, String horaFin) {
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        ContentValues values = new ContentValues();
+//        values.put(COLUMN_NOMBRE, nombreActividad);
+//        values.put(COLUMN_DESCRIPCION, descripcion);
+//        values.put(COLUMN_HORA_FIN, horaFin);
+//        db.update(TABLE_ACTIVIDADES, values, COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
+//        db.close();
+//    }
 }
