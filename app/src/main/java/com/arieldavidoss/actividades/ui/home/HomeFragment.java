@@ -1,6 +1,5 @@
 package com.arieldavidoss.actividades.ui.home;
 
-import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -18,10 +17,8 @@ import java.util.List;
 
 public class HomeFragment extends Fragment {
 
-    private RecyclerView recyclerViewTareas;
     private SQLiteHelper dbHelper;
-    private TareasAdapter tareaAdapter;
-    private List<Tarea> tareaList = new ArrayList<>();
+    private final List<Tarea> tareaList = new ArrayList<>();
 
     @Nullable
     @Override
@@ -30,7 +27,7 @@ public class HomeFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        recyclerViewTareas = view.findViewById(R.id.recyclerViewTareas);
+        RecyclerView recyclerViewTareas = view.findViewById(R.id.recyclerViewTareas);
         recyclerViewTareas.setLayoutManager(new LinearLayoutManager(getContext()));
 
         dbHelper = new SQLiteHelper(getContext());
@@ -38,7 +35,7 @@ public class HomeFragment extends Fragment {
         // Cargar tareas desde la base de datos
         cargarTareas();
 
-        tareaAdapter = new TareasAdapter(tareaList, getContext());
+        TareasAdapter tareaAdapter = new TareasAdapter(tareaList, getContext());
         recyclerViewTareas.setAdapter(tareaAdapter);
 
         return view;
