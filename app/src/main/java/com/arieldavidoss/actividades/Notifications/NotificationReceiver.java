@@ -8,14 +8,14 @@ import android.content.Intent;
 import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-
 
 public class NotificationReceiver extends BroadcastReceiver {
     private static final String CHANNEL_ID = "TareasChannel";
+
     @Override
     public void onReceive(Context context, Intent intent) {
         String taskName = intent.getStringExtra("task_name");
+        int taskId = intent.getIntExtra("task_id", 0); // Asumiendo que envías un ID de tarea también.
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "Recordatorio de Tarea";
@@ -28,17 +28,15 @@ public class NotificationReceiver extends BroadcastReceiver {
             notificationManager.createNotificationChannel(channel);
         }
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "channelID")
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID) // Usa CHANNEL_ID aquí
                 .setSmallIcon(android.R.drawable.ic_dialog_info)
                 .setContentTitle("Recordatorio de tarea")
                 .setContentText("Tienes una tarea pendiente: " + taskName)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(NotificationCompat.PRIORITY_HIGH) // Cambiar a PRIORITY_HIGH
                 .setAutoCancel(true);
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(1, builder.build());
 
-//        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-//
-//        notificationManager.notify(100, builder.build());
-   }
+        // Usar el ID de tarea para la notificación
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(taskId, builder.build()); // Usa el ID de la tarea
+    }
 }

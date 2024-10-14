@@ -1,5 +1,7 @@
 package com.arieldavidoss.actividades.ui.home;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -7,6 +9,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,8 +32,8 @@ import java.util.List;
 
 public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareaViewHolder> {
 
-    private List<Tarea> tareaList;
-    private SQLiteHelper dbHelper;
+    private final List<Tarea> tareaList;
+    private final SQLiteHelper dbHelper;
 
     public TareasAdapter(List<Tarea> tareaList,Context context) {
         this.tareaList = tareaList;
@@ -52,49 +55,55 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareaViewH
         holder.tvDescripcionTarea.setText(tarea.getDescripcion());
         holder.tvFechaTerminacion.setText(tarea.getFechaTerminacion());
         if(tarea.getCompletada() == 1){
-            holder.cardView.setCardBackgroundColor(Color.GREEN);
+            holder.cardView.setCardBackgroundColor(Color.parseColor("#388E3C"));
         }
         setNotificationForTask(holder.itemView.getContext(), tarea);
 
-        holder.btnEliminarTarea.setOnClickListener(v ->{
+        holder.btnEliminarTarea.setOnClickListener(v -> new AlertDialog.Builder(holder.itemView.getContext())
+                .setTitle("Eliminar tarea")
+                .setMessage("¿Estás seguro de que deseas eliminar esta tarea?")
+                .setPositiveButton("Sí", (dialog,which) -> {
 
-            new AlertDialog.Builder(holder.itemView.getContext())
-                    .setTitle("Eliminar tarea")
-                    .setMessage("¿Estás seguro de que deseas eliminar esta tarea?")
-                    .setPositiveButton("Sí", (dialog,which) -> {
-
-                        int tareaId = tareaList.get(position).getId();
+                    int tareaId = tareaList.get(position).getId();
 
 
-                        if (tareaId != 0) { // Verifica que el ID no sea nulo o inválido
-                            dbHelper.deleteActividad(tareaId);
-                            tareaList.remove(position);
-                            notifyItemRemoved(position);
-                            notifyItemRangeChanged(position, tareaList.size());
-                        } else {
-                            Toast.makeText(holder.itemView.getContext(),
-                                    "No se puede eliminar, tarea sin ID válido",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    })
-                    .setNegativeButton("No", null)
-                    .show();
-        });
+                    if (tareaId != 0) { // Verifica que el ID no sea nulo o inválido
+                        dbHelper.deleteActividad(tareaId);
+                        tareaList.remove(position);
+                        notifyItemRemoved(position);
+                        notifyItemRangeChanged(position, tareaList.size());
+                    } else {
+                        Toast.makeText(holder.itemView.getContext(),
+                                "No se puede eliminar, tarea sin ID válido",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show());
 
         holder.btnCompletarTarea.setOnClickListener(v -> {
-            // Cambiar el color de fondo de la tarjeta
-           new AlertDialog.Builder(holder.itemView.getContext())
-                   .setTitle("Completar tarea")
-                     .setMessage("¿Estás seguro de que deseas completar esta tarea?")
-                     .setPositiveButton("Sí", (dialog,which) -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(holder.itemView.getContext());
+            builder.setTitle("Completar tarea");
+            builder.setMessage("¿Estás seguro de que deseas completar esta tarea?");
+            builder.setPositiveButton("Sí", (dialog, which) -> {
 
-                              holder.cardView.setCardBackgroundColor(Color.GREEN);
-                              dbHelper.updateTareaCompletada(tarea.getId(), 1);
-                              Toast.makeText(holder.itemView.getContext(), "Tarea completada", Toast.LENGTH_SHORT).show();
+                // Transición suave de color a verde
+                int colorFrom = ((CardView) holder.itemView).getCardBackgroundColor().getDefaultColor();
+                int colorTo = Color.parseColor("#388E3C");
+                ObjectAnimator colorAnimation = ObjectAnimator.ofObject(holder.cardView, "cardBackgroundColor", new ArgbEvaluator(), colorFrom, colorTo);
+                colorAnimation.setDuration(500); // Duración de la transición
+                colorAnimation.start();
 
-                     })
-                     .setNegativeButton("No", null)
-                     .show();
+                // Efecto de tachado en el nombre de la tarea
+                holder.tvNombreTarea.setPaintFlags(holder.tvNombreTarea.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+
+                // Actualizar en la base de datos
+                dbHelper.updateTareaCompletada(tarea.getId(), 1);
+                Toast.makeText(holder.itemView.getContext(), "Tarea completada", Toast.LENGTH_SHORT).show();
+
+            });
+            builder.setNegativeButton("No", null);
+            builder.show();
         });
     }
     private void setNotificationForTask(Context context, Tarea tarea) {
@@ -102,6 +111,7 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareaViewH
         try {
             Date fechaTerminacion = dateFormat.parse(tarea.getFechaTerminacion());
             Calendar calendar = Calendar.getInstance();
+            assert fechaTerminacion != null;
             calendar.setTime(fechaTerminacion);
             calendar.add(Calendar.DAY_OF_YEAR, -1);  // Un día antes
 
@@ -120,7 +130,7 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareaViewH
         return tareaList.size();
     }
     public static class TareaViewHolder extends RecyclerView.ViewHolder {
-        TextView tvId,tvNombreTarea, tvDescripcionTarea, tvFechaTerminacion;
+        TextView tvNombreTarea, tvDescripcionTarea, tvFechaTerminacion;
         ImageButton btnEliminarTarea, btnCompletarTarea;
         CardView cardView;
 
