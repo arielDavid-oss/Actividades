@@ -11,11 +11,7 @@
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home" />
 
-    <fragment
-        android:id="@+id/nav_notification"
-        android:name="com.arieldavidoss.actividades.ui.gallery.NotificationsFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_notification" />
+
 
     <fragment
         android:id="@+id/nav_slideshow"
@@ -23,9 +19,9 @@
         android:label="@string/menu_slideshow"
         tools:layout="@layout/fragment_slideshow" />
 
-    <fragment
-        android:id="@+id/nav_calendario"
-        android:name="com.arieldavidoss.actividades.CalendarioFragment"
-        android:label="@string/menu_calendario"
-        tools:layout="@layout/fragment_calendario" />
+<!--    <fragment-->
+<!--        android:id="@+id/nav_calendario"-->
+<!--        android:name="com.arieldavidoss.actividades.CalendarioFragment"-->
+<!--        android:label="@string/menu_calendario"-->
+<!--        tools:layout="@layout/fragment_calendario" />-->
 </navigation>

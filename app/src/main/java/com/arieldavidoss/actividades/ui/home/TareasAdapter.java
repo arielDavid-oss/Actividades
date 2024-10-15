@@ -54,8 +54,10 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareaViewH
         holder.tvNombreTarea.setText(tarea.getNombre());
         holder.tvDescripcionTarea.setText(tarea.getDescripcion());
         holder.tvFechaTerminacion.setText(tarea.getFechaTerminacion());
+
         if(tarea.getCompletada() == 1){
             holder.cardView.setCardBackgroundColor(Color.parseColor("#388E3C"));
+            holder.tvNombreTarea.setPaintFlags(holder.tvNombreTarea.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         }
         setNotificationForTask(holder.itemView.getContext(), tarea);
 
@@ -72,6 +74,7 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareaViewH
                         tareaList.remove(position);
                         notifyItemRemoved(position);
                         notifyItemRangeChanged(position, tareaList.size());
+                        cancelNotification(holder.itemView.getContext(), tarea.getId());
                     } else {
                         Toast.makeText(holder.itemView.getContext(),
                                 "No se puede eliminar, tarea sin ID válido",
@@ -100,14 +103,21 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareaViewH
                 // Actualizar en la base de datos
                 dbHelper.updateTareaCompletada(tarea.getId(), 1);
                 Toast.makeText(holder.itemView.getContext(), "Tarea completada", Toast.LENGTH_SHORT).show();
+                cancelNotification(holder.itemView.getContext(), tarea.getId());
 
             });
             builder.setNegativeButton("No", null);
             builder.show();
         });
     }
+    @SuppressLint("ScheduleExactAlarm")
     private void setNotificationForTask(Context context, Tarea tarea) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        if (tarea.getCompletada() == 1) {
+            // Si la tarea ya está completada, no se programa ninguna notificación
+            cancelNotification(context, tarea.getId());  // Por si acaso la notificación ya fue programada anteriormente
+            return;
+        }
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat =  new SimpleDateFormat("dd/MM/yyyy HH:mm");
         try {
             Date fechaTerminacion = dateFormat.parse(tarea.getFechaTerminacion());
             Calendar calendar = Calendar.getInstance();
@@ -117,7 +127,8 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareaViewH
 
             Intent intent = new Intent(context, NotificationReceiver.class);
             intent.putExtra("task_name", tarea.getNombre());
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, tarea.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, tarea.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
 
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
@@ -125,6 +136,14 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareaViewH
             e.printStackTrace();
         }
     }
+
+    private void cancelNotification(Context context, int taskId) {
+        Intent intent = new Intent(context, NotificationReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, taskId, intent, PendingIntent.FLAG_UPDATE_CURRENT| PendingIntent.FLAG_IMMUTABLE);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.cancel(pendingIntent);
+    }
+
     @Override
     public int getItemCount() {
         return tareaList.size();
